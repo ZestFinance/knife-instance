@@ -1,0 +1,55 @@
+#!/bin/bash
+exec > >(tee /var/log/user-data.log|logger -t chef-client -s 2>/dev/console) 2>&1
+
+set -e -x
+
+if [ ! -f /usr/bin/chef-client ]; then
+  apt-get update
+  apt-get install -y ruby ruby1.8-dev build-essential wget libruby-extras libruby1.8-extras
+  cd /tmp
+  wget http://production.cf.rubygems.org/rubygems/rubygems-1.8.10.tgz
+  tar zxf rubygems-1.8.10.tgz
+  cd rubygems-1.8.10
+  ruby setup.rb --no-format-executable
+  cd ..
+  rm -Rf /tmp/rubygems-1.8.10
+fi
+
+gem update --no-rdoc --no-ri
+gem install ohai --no-rdoc --no-ri --verbose
+gem install mime-types --no-rdoc --no-ri --verbose --version 1.25
+gem install chef --no-rdoc --no-ri --verbose --version 10.24.0
+gem install tzinfo --no-rdoc --no-ri --verbose --version 0.3.33
+gem install syslog-logger --no-rdoc --no-ri --verbose --version 1.6.8
+
+mkdir -p /etc/chef
+
+<%# Remember to suppress a newline at the end of an erb statement for keys --> -%>
+
+(
+cat <<'EOP'
+<%= validation_key -%>
+EOP
+) > /tmp/validation.pem
+awk NF /tmp/validation.pem > /etc/chef/validation.pem
+rm /tmp/validation.pem
+
+(
+cat <<'EOP'
+<%= config_content %>
+EOP
+) > /etc/chef/client.rb
+
+(
+cat <<'EOP'
+<%= first_boot %>
+EOP
+) > /etc/chef/first-boot.json
+
+(
+cat <<'EOP'
+<%= encrypted_data_bag_secret -%>
+EOP
+) > /etc/chef/encrypted_data_bag_secret
+
+<%= start_chef %>

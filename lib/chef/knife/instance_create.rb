@@ -61,6 +61,136 @@ class Chef
              :description => "Show the options used to create the server and exit before running",
              :boolean => true,
              :default => false
+
+      def run
+        $stdout.sync = true
+        setup_config
+
+        @environment = config[:environment]
+        @hostname    = config[:hostname] || generate_hostname(@environment)
+        @color       = config[:cluster_tag]
+        @base_domain = config[:base_domain]
+        @region      = config[:region]
+
+        validate!
+
+        get_user_data
+
+        if config[:show_server_options]
+          details = create_server_def
+          ui.info(
+              ui.color("Creating server with options\n", :bold) +
+                  ui.color(JSON.pretty_generate(details.reject { |k, v| k == :user_data }), :blue) +
+                  ui.color("\nWith user script\n", :bold) +
+                  ui.color(details[:user_data], :cyan)
+          )
+          exit 0
+        end
+
+        server = ZestKnife.aws_for_region(@region).compute.servers.create(create_server_def)
+
+        msg_pair("Zest Hostname", fqdn(@hostname))
+        msg_pair("Environment", @environment)
+        msg_pair("Run List", config[:run_list].join(', '))
+        msg_pair("Instance ID", server.id)
+        msg_pair("Flavor", server.flavor_id)
+        msg_pair("Image", server.image_id)
+        msg_pair("Region", @region)
+        msg_pair("Availability Zone", server.availability_zone)
+        msg_pair("Security Groups", server.groups.join(", "))
+        msg_pair("SSH Key", server.key_name)
+
+        return unless config[:wait_for_it]
+
+        prnt "\n#{ui.color("Waiting for server", :magenta)}"
+
+        # wait for it to be ready to do stuff
+        server.wait_for { print "."; ready? }
+
+        puts "\n"
+        msg_pair("Public DNS Name", server.dns_name)
+        msg_pair("Public IP Address", server.public_ip_address)
+        msg_pair("Private DNS Name", server.private_dns_name)
+        msg_pair("Private IP Address", server.private_ip_address)
+        msg_pair("Instance ID", server.id)
+        msg_pair("Flavor", server.flavor_id)
+        msg_pair("Image", server.image_id)
+        msg_pair("Region", @region)
+        msg_pair("Availability Zone", server.availability_zone)
+        msg_pair("Security Groups", server.groups.join(", "))
+        msg_pair("SSH Key", server.key_name)
+        msg_pair("Root Device Type", server.root_device_type)
+
+        zone.records.create(:name => fqdn(@hostname), :type => 'A', :value => server.private_ip_address, :ttl => 300)
+
+        server
+      end
+
+      def self.new_with_defaults environment, region, color, base_domain, opts
+        new.tap do |ic|
+          ic.config[:environment]               = environment
+          ic.config[:cluster_tag]               = color
+          ic.config[:region]                    = region
+          ic.config[:base_domain]               = base_domain
+          ic.config[:aws_ssh_key_id]            = opts[:aws_ssh_key_id]
+          ic.config[:aws_access_key_id]         = opts[:aws_access_key_id]
+          ic.config[:aws_secret_access_key]     = opts[:aws_secret_access_key]
+          ic.config[:availability_zone]         = opts[:availability_zone]
+          ic.config[:encrypted_data_bag_secret] = opts[:encrypted_data_bag_secret]
+          ic.config[:wait_for_it]               = opts[:wait_for_it]
+          ic.config[:image]                     = opts[:image]
+        end
+      end
+
+      def create_server_def
+        server_def = {
+            :image_id => image,
+            :groups => security_group,
+            :flavor_id => config[:flavor],
+            :key_name => config[:aws_ssh_key_id],
+            :availability_zone => availability_zone,
+            :tags => {
+                'Name' => @hostname,
+                'environment' => @environment
+            },
+            :user_data => config[:without_user_data] ? "" : get_user_data,
+            :iam_instance_profile_name => config[:iam_role]
+        }
+
+        server_def
+      end
+
+      def image
+        config[:image]
+      end
+
+      def security_group
+        config[:security_groups]
+      end
+
+      def availability_zone
+        config[:availability_zone]
+      end
+
+      def validate!
+        unless File.exists?(config[:encrypted_data_bag_secret])
+          errors << "Could not find encrypted data bag secret. Tried #{config[:encrypted_data_bag_secret]}"
+        end
+
+        if ami.nil?
+          errors << "You have not provided a valid image. Tried to find '#{image}'."
+        end
+
+        validate_hostname @hostname
+
+        super([:aws_access_key_id, :aws_secret_access_key,
+               :flavor, :aws_ssh_key_id, :run_list])
+      end
+
+      def get_user_data
+        generator = Zest::BootstrapGenerator.new(Chef::Config[:validation_key], Chef::Config[:validation_client_name], Chef::Config[:chef_server_url], @environment, config[:run_list], @hostname, @color, @base_domain, config[:encrypted_data_bag_secret])
+        generator.generate
+      end
     end
   end
 end
