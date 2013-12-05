@@ -19,5 +19,6 @@ Gem::Specification.new do |spec|
   spec.require_paths = ["lib"]
 
   spec.add_dependency 'chef', '>= 0.10.24'
+  spec.add_dependency 'fog', '>= 1.9.0'
   spec.add_development_dependency "rake"
 end
