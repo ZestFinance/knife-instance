@@ -223,7 +223,7 @@ class ZestKnife < Chef::Knife
       :long => "--region REGION",
       :short => '-R REGION',
       :description => "Your AWS region",
-      :default => "",
+      :default => ENV['AWS_REGION'],
       :proc => Proc.new { |key| Chef::Config[:knife][:region] = key }
     },
     :encrypted_data_bag_secret => {
