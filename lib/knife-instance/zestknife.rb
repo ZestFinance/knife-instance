@@ -1,6 +1,13 @@
 require 'chef/knife'
 
 class ZestKnife < Chef::Knife
+  def errors
+    @errors ||= []
+  end
+
+  def errors?
+    !errors.empty?
+  end
 
   def self.aws_for_region(region)
     Zest::AWS.new(Chef::Config[:knife][:aws_access_key_id], Chef::Config[:knife][:aws_secret_access_key], region)
@@ -223,7 +230,7 @@ class ZestKnife < Chef::Knife
       :short => "-B FILE",
       :long => "--encrypted_data_bag_secret FILE",
       :description => "Path to the secret key to unlock encrypted chef data bags",
-      :default => ENV["DATABG_KEY_PATH"] ? File.expand_path(ENV["DATABAG_KEY_PATH"]) : ""
+      :default => ENV["DATABAG_KEY_PATH"] ? File.expand_path(ENV["DATABAG_KEY_PATH"]) : ""
     },
     :aws_ssh_key_id => {
       :short => "-S KEY",
