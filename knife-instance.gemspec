@@ -21,4 +21,6 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'chef', '>= 0.10.24'
   spec.add_dependency 'fog', '>= 1.9.0'
   spec.add_development_dependency "rake"
+  spec.add_development_dependency "rspec"
+  spec.add_development_dependency "require_all"
 end

@@ -108,9 +108,6 @@ class ZestKnife < Chef::Knife
     check_services(hostname).each do |service|
       errors << "#{hostname} in #{service.class} already exists. Delete first."
     end
-
-    errors << "hostname does not start with a valid prefix" unless hostname_starts_with_valid_prefix?(hostname)
-    errors << "hostname is not valid prefix followed by numbers" unless hostname_is_alpha_followed_by_numbers?(hostname)
   end
 
   def check_services hostname
@@ -125,11 +122,11 @@ class ZestKnife < Chef::Knife
   end
 
   def domain_prefix
-    @base_domain.first
+    @base_domain[0]
   end
 
   def environment_prefix env
-    env.first
+    env[0]
   end
 
   def random_three_digit_number
