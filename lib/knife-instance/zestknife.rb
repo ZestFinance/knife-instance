@@ -1,4 +1,6 @@
 require 'chef/knife'
+require 'knife-instance/aws'
+require 'knife-instance/bootstrap_generator'
 
 class ZestKnife < Chef::Knife
   def errors
