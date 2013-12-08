@@ -18,15 +18,15 @@ describe ZestKnife do
   end
 
   describe "#zone" do
-    let(:our_zone)        { mock('our dns zone',   :domain => "internal.com.") }
-    let(:some_other_zone) { mock('other dns zone', :domain => "zambocom.net.") }
+    let(:our_zone)        { double('our dns zone',   :domain => "internal.com.") }
+    let(:some_other_zone) { double('other dns zone', :domain => "zambocom.net.") }
 
     before(:each) do
-      aws_mock = mock
-      Zest::AWS.stub(:new).and_return(aws_mock)
-      dns_mock = mock
-      aws_mock.stub(:dns).and_return(dns_mock)
-      dns_mock.stub(:zones).and_return([our_zone, some_other_zone])
+      aws_double = double
+      Zest::AWS.stub(:new).and_return(aws_double)
+      dns_double = double
+      aws_double.stub(:dns).and_return(dns_double)
+      dns_double.stub(:zones).and_return([our_zone, some_other_zone])
     end
 
     its(:zone) { should == our_zone }
@@ -98,7 +98,7 @@ describe ZestKnife do
 
   describe "#find_r53" do
     let(:r53_cname_record) do
-      mock('Fog::DNS::AWS::Record',
+      double('Fog::DNS::AWS::Record',
            :class => 'Fog::DNS::AWS::Record',
            :name => "d999.internal.com.",
            :type => "CNAME",
@@ -106,8 +106,8 @@ describe ZestKnife do
     end
 
     before do
-      Fog::DNS.stub(:new) { mock('fog dns client',
-                                 :zones => [mock('fake dns zone',
+      Fog::DNS.stub(:new) { double('fog dns client',
+                                 :zones => [double('fake dns zone',
                                                  :records => r53_records,
                                                  :domain => "internal.com.")])}
     end
@@ -118,7 +118,7 @@ describe ZestKnife do
     end
 
     context "there is no such instance" do
-      let(:r53_records) { mock('Fake records', :select => [], :get => nil) }
+      let(:r53_records) { double('Fake records', :select => [], :get => nil) }
       it { subject.find_r53('d999').should == [] }
     end
   end
@@ -126,14 +126,14 @@ describe ZestKnife do
   describe "#find_ec2" do
     let(:ec2_servers) { [ec2_instance] }
     let(:ec2_instance) do
-      mock('Fog::Compute::AWS::Server',
+      double('Fog::Compute::AWS::Server',
            :class => 'Fog::Compute::AWS::Server',
            :id => 'my_ec2_instance',
            :tags => {'Name' => 'd999'})
     end
 
     before do
-      Fog::Compute.stub(:new) { mock('fog compute client', :servers => ec2_servers) }
+      Fog::Compute.stub(:new) { double('fog compute client', :servers => ec2_servers) }
     end
 
     context "instance exists" do
@@ -148,10 +148,10 @@ describe ZestKnife do
   end
 
   describe "#find_item" do
-    let(:client) { mock }
+    let(:client) { double }
 
     context "when class can be loaded" do
-      let(:remote_resource) { mock }
+      let(:remote_resource) { double }
       before { client.should_receive(:load).with('my-name').and_return remote_resource }
       it { subject.find_item(client, 'my-name').should == [remote_resource] }
     end

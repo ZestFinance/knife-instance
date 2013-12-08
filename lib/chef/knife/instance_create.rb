@@ -14,6 +14,8 @@ class Chef
         require 'chef/api_client'
       end
 
+      attr_accessor :hostname
+
       with_opts :aws_ssh_key_id, :encrypted_data_bag_secret, :wait_for_it
       with_validated_opts :cluster_tag, :environment, :base_domain, :region
 
@@ -67,9 +69,9 @@ class Chef
         setup_config
 
         @environment = config[:environment]
+        @base_domain = config[:base_domain]
         @hostname    = config[:hostname] || generate_hostname(@environment)
         @color       = config[:cluster_tag]
-        @base_domain = config[:base_domain]
         @region      = config[:region]
 
         validate!
@@ -89,7 +91,7 @@ class Chef
 
         server = ZestKnife.aws_for_region(@region).compute.servers.create(create_server_def)
 
-        msg_pair("Zest Hostname", fqdn(@hostname))
+        msg_pair("Zest Hostname", fqdn(hostname))
         msg_pair("Environment", @environment)
         msg_pair("Run List", config[:run_list].join(', '))
         msg_pair("Instance ID", server.id)
@@ -102,7 +104,7 @@ class Chef
 
         return unless config[:wait_for_it]
 
-        prnt "\n#{ui.color("Waiting for server", :magenta)}"
+        print "\n#{ui.color("Waiting for server", :magenta)}"
 
         # wait for it to be ready to do stuff
         server.wait_for { print "."; ready? }
@@ -121,7 +123,7 @@ class Chef
         msg_pair("SSH Key", server.key_name)
         msg_pair("Root Device Type", server.root_device_type)
 
-        zone.records.create(:name => fqdn(@hostname), :type => 'A', :value => server.private_ip_address, :ttl => 300)
+        zone.records.create(:name => fqdn(hostname), :type => 'A', :value => server.private_ip_address, :ttl => 300)
 
         server
       end
@@ -150,7 +152,7 @@ class Chef
             :key_name => config[:aws_ssh_key_id],
             :availability_zone => availability_zone,
             :tags => {
-                'Name' => @hostname,
+                'Name' => hostname,
                 'environment' => @environment
             },
             :user_data => config[:without_user_data] ? "" : get_user_data,
@@ -181,14 +183,14 @@ class Chef
           errors << "You have not provided a valid image. Tried to find '#{image}'."
         end
 
-        validate_hostname @hostname
+        validate_hostname hostname
 
         super([:aws_access_key_id, :aws_secret_access_key,
                :flavor, :aws_ssh_key_id, :run_list])
       end
 
       def get_user_data
-        generator = Zest::BootstrapGenerator.new(Chef::Config[:validation_key], Chef::Config[:validation_client_name], Chef::Config[:chef_server_url], @environment, config[:run_list], @hostname, @color, @base_domain, config[:encrypted_data_bag_secret])
+        generator = Zest::BootstrapGenerator.new(Chef::Config[:validation_key], Chef::Config[:validation_client_name], Chef::Config[:chef_server_url], @environment, config[:run_list], hostname, @color, @base_domain, config[:encrypted_data_bag_secret])
         generator.generate
       end
     end

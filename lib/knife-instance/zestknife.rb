@@ -3,14 +3,13 @@ require 'knife-instance/aws'
 require 'knife-instance/bootstrap_generator'
 
 class ZestKnife < Chef::Knife
-  attr_reader :base_domain
+  attr_accessor :base_domain
+  attr_accessor :internal_domain
 
-  def errors
-    @errors ||= []
-  end
-
-  def errors?
-    !errors.empty?
+  def msg_pair(label, value, color=:cyan)
+    if value && !value.to_s.empty?
+      puts "#{ui.color(label, color)}: #{value}"
+    end
   end
 
   def self.aws_for_region(region)
@@ -87,7 +86,7 @@ class ZestKnife < Chef::Knife
   end
 
   def domain
-    ""
+    @internal_domain || ""
   end
 
   def generate_hostname env
@@ -163,6 +162,14 @@ class ZestKnife < Chef::Knife
     end
   end
 
+  def errors
+    @errors ||= []
+  end
+
+  def errors?
+    !errors.empty?
+  end
+
   def validate!(keys=[:aws_access_key_id, :aws_secret_access_key])
     keys.each do |k|
       if Chef::Config[:knife][k].nil? & config[k].nil?
@@ -231,13 +238,13 @@ class ZestKnife < Chef::Knife
       :short => "-B FILE",
       :long => "--encrypted_data_bag_secret FILE",
       :description => "Path to the secret key to unlock encrypted chef data bags",
-      :default => ENV["DATABAG_KEY_PATH"] ? File.expand_path(ENV["DATABAG_KEY_PATH"]) : ""
+      :default => ENV['DATABAG_KEY_PATH']
     },
     :aws_ssh_key_id => {
       :short => "-S KEY",
       :long => "--aws-ssh-key KEY",
       :description => "AWS EC2 SSH Key Pair Name",
-      :default => ""
+      :default => ENV["aws_ssh_key"]
     },
     :base_domain => {
       :long => "--base-domain DOMAIN",
