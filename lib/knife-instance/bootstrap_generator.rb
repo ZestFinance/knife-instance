@@ -1,7 +1,7 @@
 # This class generates the ec2 user-data bootstrap script
 module Zest
   class BootstrapGenerator
-    CONFIG_FILE_TEMPLATE = File.expand_path('templates/boot.sh.erb', __FILE__)
+    CONFIG_FILE_TEMPLATE = File.expand_path 'templates/boot.sh.erb', File.dirname(__FILE__)
 
     def initialize(validation_key_file, validation_client_name, chef_server_url, environment, run_list, hostname, color, base_domain, encrypted_databag_secret_file)
       @validation_client_name = validation_client_name

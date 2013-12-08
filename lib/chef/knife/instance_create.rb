@@ -174,6 +174,10 @@ class Chef
         config[:availability_zone]
       end
 
+      def ami
+        @ami ||= ZestKnife.aws_for_region(@region).compute.images.get(image)
+      end
+
       def validate!
         unless File.exists?(config[:encrypted_data_bag_secret])
           errors << "Could not find encrypted data bag secret. Tried #{config[:encrypted_data_bag_secret]}"

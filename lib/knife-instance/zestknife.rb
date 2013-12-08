@@ -195,6 +195,9 @@ class ZestKnife < Chef::Knife
   def validate_region
   end
 
+  def validate_force_deploy
+  end
+
   def validate_color
     unless @color
       errors << "You must provide a cluster_tag with the -t option"
@@ -249,7 +252,7 @@ class ZestKnife < Chef::Knife
     :base_domain => {
       :long => "--base-domain DOMAIN",
       :description => "The domain to be used for this node.",
-      :default => ""
+      :default => ENV["default_base_domain"] || ""
     },
      :wait_for_it => {
       :short => "-W",
@@ -269,6 +272,7 @@ class ZestKnife < Chef::Knife
     :base_domain  => :validate_domain,
     :cluster_tag  => :validate_color,
     :prod         => :validate_prod,
+    :force_deploy => :validate_force_deploy,
     :region       => :validate_region
   }
 end
