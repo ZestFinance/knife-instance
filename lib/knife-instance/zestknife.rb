@@ -3,6 +3,8 @@ require 'knife-instance/aws'
 require 'knife-instance/bootstrap_generator'
 
 class ZestKnife < Chef::Knife
+  attr_reader :base_domain
+
   def errors
     @errors ||= []
   end
@@ -122,7 +124,7 @@ class ZestKnife < Chef::Knife
   end
 
   def domain_prefix
-    @base_domain[0]
+    base_domain[0]
   end
 
   def environment_prefix env

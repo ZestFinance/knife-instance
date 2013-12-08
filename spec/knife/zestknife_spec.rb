@@ -205,11 +205,9 @@ describe ZestKnife do
   describe '#random_hostname' do
     context 'environment is production' do
       let(:env) { 'production' }
-      #TODO: please refactor me. It shouldn't be that brute force :(
-      before { subject.instance_variable_set :@base_domain, base_domain }
+      before { subject.stub(:base_domain).and_return('example.com') }
 
       context 'external domain is example.com' do
-        let(:base_domain) { 'example.com' }
         it { subject.random_hostname(env).should =~ /^ep\d\d\d$/ }
       end
     end
