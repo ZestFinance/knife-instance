@@ -49,6 +49,8 @@ describe ZestKnife do
   end
 
   describe "#setup_config" do
+    after { Chef::Config[:knife].delete :foo }
+
     it "should find env var and add to Chef::Config" do
       ENV["FOO"] = "bar"
       subject.setup_config(['FOO'])
@@ -59,11 +61,6 @@ describe ZestKnife do
       ENV["foo"] = "bar"
       subject.setup_config(["foo"])
       Chef::Config[:knife]["foo"].should == "bar"
-
-      Chef::Config[:knife]["foo"] = 2
-      ENV["foo"] = "bar"
-      subject.setup_config(["foo"])
-      Chef::Config[:knife]["foo"].should == 2
     end
   end
 
