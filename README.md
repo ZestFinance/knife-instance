@@ -28,7 +28,10 @@ export aws_secret_access_key='Put your key here'
 ## Usage
 
 ```shell
-bundle exec knife instance create -E development --image 'my_ec2-image' -t myclustertag --group=my_security_group
+bundle exec knife instance create -E development \
+  --image 'my_ec2-image' \
+  -t myclustertag \
+  --group=my_security_group
 ```
 
 ## Contributing
