@@ -1,4 +1,4 @@
-# knife-instance
+# knife-instance [![Code Climate](https://codeclimate.com/github/ZestFinance/knife-instance.png)](https://codeclimate.com/github/ZestFinance/knife-instance)
 
 Manage EC2 instances with Chef from the command line
 
