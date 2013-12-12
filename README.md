@@ -1,4 +1,4 @@
-# knife-instance
+# knife-instance [![Code Climate](https://codeclimate.com/github/ZestFinance/knife-instance.png)](https://codeclimate.com/github/ZestFinance/knife-instance)
 
 Manage EC2 instances with Chef from the command line
 
@@ -41,3 +41,6 @@ bundle exec knife instance create -E development \
 3. Commit your changes (`git commit -am 'Add some feature'`)
 4. Push to the branch (`git push origin my-new-feature`)
 5. Create new Pull Request
+
+## Credits
+Inspired by [knife-ec2 gem](https://github.com/opscode/knife-ec2)
