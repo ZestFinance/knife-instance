@@ -1,4 +1,4 @@
-# knife-instance [![Code Climate](https://codeclimate.com/github/ZestFinance/knife-instance.png)](https://codeclimate.com/github/ZestFinance/knife-instance)
+# knife-instance [![Code Climate](https://codeclimate.com/github/ZestFinance/knife-instance.png)](https://codeclimate.com/github/ZestFinance/knife-instance) [![Build Status](https://travis-ci.org/ZestFinance/knife-instance.png)](https://travis-ci.org/ZestFinance/knife-instance)
 
 Manage EC2 instances with Chef from the command line
 
@@ -29,9 +29,9 @@ export aws_secret_access_key='Put your key here'
 
 ```shell
 bundle exec knife instance create -E development \
-  --image 'my_ec2-image' \
+  --image my_ec2-image \
   -t myclustertag \
-  --group=my_security_group
+  --group my_security_group
 ```
 
 ## Contributing
