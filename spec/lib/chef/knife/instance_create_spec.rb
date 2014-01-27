@@ -91,5 +91,20 @@ describe Chef::Knife::InstanceCreate do
         end
       end
     end
+
+    describe "#create_server_def" do
+      context "VPC specific parameters" do
+        let(:subnet_id) { "subnet-123" }
+        let(:security_group_ids) { ['sg-123', 'sg456'] }
+        before do
+          @instance.config[:security_group_ids] = security_group_ids
+          @instance.config[:subnet_id]          = subnet_id
+        end
+
+        subject { @instance.create_server_def }
+        its([:security_group_ids]) { should == security_group_ids }
+        its([:subnet_id])          { should == subnet_id }
+      end
+    end
   end
 end

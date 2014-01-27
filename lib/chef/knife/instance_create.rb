@@ -40,10 +40,22 @@ class Chef
              :long => "--groups X,Y,Z",
              :description => "The security groups for this server"
 
+      option :security_group_ids,
+             :short => "-g X,Y,Z",
+             :long => "--security-group-ids X,Y,Z",
+             :description => "The security group ids for this server; required when using VPC",
+             :proc => Proc.new { |security_group_ids| security_group_ids.split(',') }
+
       option :availability_zone,
              :short => "-Z ZONE",
              :long => "--availability-zone ZONE",
              :description => "The Availability Zone"
+
+      option :subnet_id,
+             :short => "-s SUBNET-ID",
+             :long => "--subnet SUBNET-ID",
+             :description => "create node in this Virtual Private Cloud Subnet ID (implies VPC mode)",
+             :proc => Proc.new { |key| Chef::Config[:knife][:subnet_id] = key }
 
       option :hostname,
              :short => "-h NAME",
@@ -141,21 +153,24 @@ class Chef
           ic.config[:encrypted_data_bag_secret] = opts[:encrypted_data_bag_secret]
           ic.config[:wait_for_it]               = opts[:wait_for_it]
           ic.config[:image]                     = opts[:image]
+          ic.config[:subnet_id]                 = opts[:subnet_id]
         end
       end
 
       def create_server_def
         server_def = {
-            :image_id => image,
-            :groups => security_group,
-            :flavor_id => config[:flavor],
-            :key_name => config[:aws_ssh_key_id],
-            :availability_zone => availability_zone,
+            :image_id           => image,
+            :groups             => config[:security_groups],
+            :security_group_ids => config[:security_group_ids],
+            :flavor_id          => config[:flavor],
+            :key_name           => config[:aws_ssh_key_id],
+            :availability_zone  => availability_zone,
+            :subnet_id          => config[:subnet_id],
             :tags => {
-                'Name' => hostname,
+                'Name'        => hostname,
                 'environment' => @environment
             },
-            :user_data => config[:without_user_data] ? "" : get_user_data,
+            :user_data                 => config[:without_user_data] ? "" : get_user_data,
             :iam_instance_profile_name => config[:iam_role]
         }
 
@@ -164,10 +179,6 @@ class Chef
 
       def image
         config[:image]
-      end
-
-      def security_group
-        config[:security_groups]
       end
 
       def availability_zone
