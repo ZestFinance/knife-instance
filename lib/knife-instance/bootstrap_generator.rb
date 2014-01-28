@@ -20,7 +20,8 @@ module Zest
         "run_list"          => @run_list,
         "assigned_hostname" => @hostname,
         "rails"             => {"cluster" => {"color" => @color}},
-        "base_domain"       => @base_domain
+        "base_domain"       => @base_domain,
+        "domain"            => domain
       }.to_json
     end
 
