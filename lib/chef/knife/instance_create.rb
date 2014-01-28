@@ -173,8 +173,13 @@ class Chef
             :user_data                 => config[:without_user_data] ? "" : get_user_data,
             :iam_instance_profile_name => config[:iam_role]
         }
+        server_def[:associate_public_ip] = true if vpc_mode?
 
         server_def
+      end
+
+      def vpc_mode?
+        config[:subnet_id]
       end
 
       def image
