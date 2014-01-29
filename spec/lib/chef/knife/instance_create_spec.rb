@@ -102,8 +102,9 @@ describe Chef::Knife::InstanceCreate do
         end
 
         subject { @instance.create_server_def }
-        its([:security_group_ids]) { should == security_group_ids }
-        its([:subnet_id])          { should == subnet_id }
+        its([:security_group_ids])  { should == security_group_ids }
+        its([:subnet_id])           { should == subnet_id }
+        its([:associate_public_ip]) { should == true }
       end
     end
   end

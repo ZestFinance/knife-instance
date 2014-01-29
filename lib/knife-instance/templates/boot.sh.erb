@@ -22,7 +22,8 @@ gem install chef --no-rdoc --no-ri --verbose --version 10.24.0
 gem install tzinfo --no-rdoc --no-ri --verbose --version 0.3.33
 gem install syslog-logger --no-rdoc --no-ri --verbose --version 1.6.8
 
-mkdir -p /etc/chef
+mkdir -p /etc/chef/ohai/hints
+touch /etc/chef/ohai/hints/ec2.json # Tell ohai that it is an EC2 node in VPC
 
 <%# Remember to suppress a newline at the end of an erb statement for keys --> -%>
 

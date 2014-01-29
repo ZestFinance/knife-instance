@@ -173,8 +173,13 @@ class Chef
             :user_data                 => config[:without_user_data] ? "" : get_user_data,
             :iam_instance_profile_name => config[:iam_role]
         }
+        server_def[:associate_public_ip] = true if vpc_mode?
 
         server_def
+      end
+
+      def vpc_mode?
+        config[:subnet_id]
       end
 
       def image
@@ -205,7 +210,14 @@ class Chef
       end
 
       def get_user_data
-        generator = Zest::BootstrapGenerator.new(Chef::Config[:validation_key], Chef::Config[:validation_client_name], Chef::Config[:chef_server_url], @environment, config[:run_list], hostname, @color, @base_domain, config[:encrypted_data_bag_secret])
+        generator = Zest::BootstrapGenerator.new(Chef::Config[:validation_key], Chef::Config[:validation_client_name], Chef::Config[:chef_server_url], config[:encrypted_data_bag_secret],
+          :environment => @environment,
+          :run_list => config[:run_list],
+          :hostname => hostname,
+          :color => @color,
+          :base_domain => @base_domain,
+          :domain => domain
+        )
         generator.generate
       end
     end
