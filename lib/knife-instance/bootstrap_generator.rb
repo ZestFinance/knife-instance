@@ -3,7 +3,7 @@ module Zest
   class BootstrapGenerator
     CONFIG_FILE_TEMPLATE = File.expand_path 'templates/boot.sh.erb', File.dirname(__FILE__)
 
-    def initialize(validation_key_file, validation_client_name, chef_server_url, environment, run_list, hostname, color, base_domain, encrypted_databag_secret_file)
+    def initialize(validation_key_file, validation_client_name, chef_server_url, environment, run_list, hostname, color, base_domain, encrypted_databag_secret_file, domain)
       @validation_client_name = validation_client_name
       @validation_key_file = validation_key_file
       @chef_server_url = chef_server_url
@@ -13,6 +13,7 @@ module Zest
       @color = color
       @base_domain = base_domain
       @encrypted_databag_secret_file = encrypted_databag_secret_file
+      @domain = domain
     end
 
     def first_boot
@@ -21,7 +22,7 @@ module Zest
         "assigned_hostname" => @hostname,
         "rails"             => {"cluster" => {"color" => @color}},
         "base_domain"       => @base_domain,
-        "domain"            => domain
+        "domain"            => @domain
       }.to_json
     end
 

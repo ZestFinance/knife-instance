@@ -210,7 +210,7 @@ class Chef
       end
 
       def get_user_data
-        generator = Zest::BootstrapGenerator.new(Chef::Config[:validation_key], Chef::Config[:validation_client_name], Chef::Config[:chef_server_url], @environment, config[:run_list], hostname, @color, @base_domain, config[:encrypted_data_bag_secret])
+        generator = Zest::BootstrapGenerator.new(Chef::Config[:validation_key], Chef::Config[:validation_client_name], Chef::Config[:chef_server_url], @environment, config[:run_list], hostname, @color, @base_domain, config[:encrypted_data_bag_secret], domain)
         generator.generate
       end
     end
