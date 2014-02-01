@@ -1,0 +1,3 @@
+knife-instance gem was based on the code from knife-ec2 gem.
+knife-ec2 is licensed under Apache license. knife-instance is licensed under MIT license.
+Both licenses are included in knife-instance distribution.

@@ -1,3 +1,7 @@
+# This is the software that has been written ZestFinance
+# It is based on https://github.com/opscode/knife-ec2
+# which is licensed under apache license
+
 require "knife-instance/zestknife"
 
 class Chef
