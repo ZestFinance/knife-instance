@@ -241,7 +241,8 @@ class ZestKnife < Chef::Knife
       :short => "-B FILE",
       :long => "--encrypted_data_bag_secret FILE",
       :description => "Path to the secret key to unlock encrypted chef data bags",
-      :default => ENV['DATABAG_KEY_PATH']
+      :proc => Proc.new { |file| File.expand_path(file) },
+      :default => File.expand_path(ENV['DATABAG_KEY_PATH'])
     },
     :aws_ssh_key_id => {
       :short => "-S KEY",
