@@ -7,7 +7,7 @@ Gem::Specification.new do |spec|
   spec.name          = "knife-instance"
   spec.version       = Knife::Instance::VERSION
   spec.authors       = ["Alexander Tamoykin", "Val Brodsky"]
-  spec.email         = ["at@zestfinance.com", "vlb@zestfinance.com"]
+  spec.email         = ["at@zestfinance.com", "vlb@zestfinance.com", "p@zestfinance.com"]
   spec.summary       = %q{Manage EC2 instances with Chef from the command line}
   spec.description   = %q{Manage EC2 instances with Chef from the command line}
   spec.homepage      = "https://github.com/ZestFinance/knife-instance"
