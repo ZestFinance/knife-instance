@@ -5,17 +5,10 @@ set -e -x
 
 if [ ! -f /usr/bin/chef-client ]; then
   apt-get update
-  apt-get install -y ruby ruby1.8-dev build-essential wget libruby-extras libruby1.8-extras
-  cd /tmp
-  wget http://production.cf.rubygems.org/rubygems/rubygems-1.8.10.tgz
-  tar zxf rubygems-1.8.10.tgz
-  cd rubygems-1.8.10
-  ruby setup.rb --no-format-executable
-  cd ..
-  rm -Rf /tmp/rubygems-1.8.10
+  apt-get install -y curl zlib1g-dev build-essential libssl-dev libreadline-dev libyaml-dev libxml2-dev libxslt1-dev ruby ruby-dev libruby1.9
+  gem update --no-rdoc --no-ri
 fi
 
-gem update --no-rdoc --no-ri
 gem install ohai --no-rdoc --no-ri --verbose
 gem install mime-types --no-rdoc --no-ri --verbose --version 1.25
 gem install chef --no-rdoc --no-ri --verbose --version 10.24.0

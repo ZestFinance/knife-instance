@@ -56,7 +56,7 @@ module Zest
     end
 
     def start_chef
-      "/usr/bin/chef-client -j /etc/chef/first-boot.json -E #{@environment}"
+      "chef-client -j /etc/chef/first-boot.json -E #{@environment}"
     end
   end
 end
